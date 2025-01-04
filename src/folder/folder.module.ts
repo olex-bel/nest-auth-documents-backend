@@ -4,11 +4,11 @@ import { FolderService } from './folder.service';
 import { FolderController } from './folder.controller';
 import { RolesPermissionsModule } from '../roles-permissions/roles-permissions.module';
 import Folder from '../entities/folder.entity';
-import User from '../entities/user.entity';
+import UserFolder from '../entities/user.folder.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Folder, User]),
+    TypeOrmModule.forFeature([Folder, UserFolder]),
     RolesPermissionsModule
   ],
   providers: [FolderService],

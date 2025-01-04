@@ -6,6 +6,9 @@ import UserRole from 'src/entities/user.role.entity';
 import UserFolder from 'src/entities/user.folder.entity';
 
 const ADMIN_ROLE_ID = 1;
+const PERMISSION_EDITOR =  1;
+const PERMISSION_VIEWER = 2;
+const PERMISSION_CONTRIBUTOR = 3;
 
 @Injectable()
 export class RolesPermissionsService {

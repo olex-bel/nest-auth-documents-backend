@@ -23,6 +23,10 @@ export class PermissionGuard implements CanActivate {
                 return this.rolesPermissionsService.isAdmin(user.userId);
             case 'delete:folder':
                 return this.rolesPermissionsService.isAdmin(user.userId);
+            case 'rename:folder':
+                return this.rolesPermissionsService.isAdmin(user.userId);
+            case 'manage:permissions':
+                return this.rolesPermissionsService.isAdmin(user.userId);
             default:
                 return false;
         }
