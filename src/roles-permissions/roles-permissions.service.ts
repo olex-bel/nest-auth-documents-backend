@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import Role from '../entities/role.entity';
-import UserRole from 'src/entities/user.role.entity';
-import UserFolder from 'src/entities/user.folder.entity';
+import UserRole from '../entities/user.role.entity';
+import UserFolder from '../entities/user.folder.entity';
 
 const ADMIN_ROLE_ID = 1;
 const PERMISSION_EDITOR =  1;

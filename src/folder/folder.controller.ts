@@ -26,7 +26,13 @@ export class FolderController {
     @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
     async deleteFolder(@Param('id') id: string) {
-        return this.folderService.deleteFolder(id);
+        const deleted = await this.folderService.deleteFolder(id);
+
+        if (deleted.affected === 0) {
+            throw new NotFoundException('Folder not found.');
+        }
+
+        return deleted;
     }
 
     @Patch('rename/:id')
@@ -34,7 +40,13 @@ export class FolderController {
     @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
     async renameFolder(@Body() renameFolderDto: RenameFolderDto, @Param('id') id: string) {
-        return this.folderService.renameFolder(id, renameFolderDto.name);
+        const updated = await this.folderService.renameFolder(id, renameFolderDto.name);
+
+        if (updated.affected == 0) {
+            throw new NotFoundException('Folder not found.');
+        }
+
+        return updated;
     }
 
     @Get(':id')

@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RolesPermissionsService } from 'src/roles-permissions/roles-permissions.service';
+import { RolesPermissionsService } from '../../roles-permissions/roles-permissions.service';
 import type { PublicUser } from '../strategy/jwt.strategy';
 
 @Injectable()
