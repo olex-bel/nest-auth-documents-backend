@@ -1,7 +1,7 @@
 import { Controller, Post, Patch, Delete, Get, UseGuards, Body, Request, Param, Query, NotFoundException, ConflictException } from '@nestjs/common';
 import { FolderService } from './folder.service';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
-import { PermissionGuard } from '../auth/guard/permission-guard';
+import { PermissionGuard } from '../roles-permissions/guard/permission-guard';
 import { RequirePermissions } from '../decorators/permission.decorator';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { RenameFolderDto } from './dto/rename-folder.dto';
@@ -72,13 +72,11 @@ export class FolderController {
     @RequirePermissions('manage:permissions')
     @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
-    async addPermission(@Body() setPermissionsDto: SetPermissionsDto, @Param('folderId') folderId: string) {
+    async setPermission(@Body() setPermissionsDto: SetPermissionsDto, @Param('folderId') folderId: string) {
         const { userId, permissionId } = setPermissionsDto;
 
         try {
-            const userFolder = await this.folderService.addPermission(userId, folderId, permissionId);
-
-            return userFolder;
+            return await this.folderService.setPermission(userId, folderId, permissionId);
         } catch (error) {
             if (error.code === '23503') {
                 if (error.detail.includes('folder_id')) {
@@ -88,8 +86,6 @@ export class FolderController {
                 } else if (error.detail.includes('user_id')) {
                     throw new NotFoundException(`User with ID ${userId} not found`);
                 }
-
-                console.error(error.detail);
             } else if (error.code === '23505') {
                 throw new ConflictException('Permission already granted.');
             }
@@ -103,8 +99,8 @@ export class FolderController {
     @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
     async removePermission(@Body() revokePermissionDto: RevokePermissionDto, @Param('folderId') folderId: string) {
-        const { userId, permissionId } = revokePermissionDto;
-        const deleted = await this.folderService.revokePermission(folderId, userId, permissionId);
+        const { userId } = revokePermissionDto;
+        const deleted = await this.folderService.revokePermission(folderId, userId);
 
         if (deleted.affected === 0) {
             throw new NotFoundException('Permission not found.');

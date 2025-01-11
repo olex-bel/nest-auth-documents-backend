@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import User from './user.entity';
 import Folder from './folder.entity';
 
@@ -13,18 +13,26 @@ export default class Document {
     @Column()
     content: string;
 
-    @Column({ name: 'created_at' })
+    @Column({ name: 'user_id' })
+    userId: string;
+
+    @Column({ name: 'folder_id' })
+    folderId: string;
+
+    @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
-    @Column({ name: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 
     @Column()
     checksum: string;
 
     @ManyToOne(() => User)
+    @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
     user: User;
 
     @ManyToOne(() => Folder)
+    @JoinColumn({ name: 'folder_id', referencedColumnName: 'id' })
     folder: Folder;
 }

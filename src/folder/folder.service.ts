@@ -43,16 +43,16 @@ export class FolderService {
         return { folders, newCursor };
     }
 
-    async addPermission(userId: string, folderId: string, permissionId: number) {
-        const userFolder = new UserFolder();
-        userFolder.userId = userId;
-        userFolder.folderId = folderId;
-        userFolder.permissionId = permissionId;
-        return this.userFolderRepository.save(userFolder);
+    async setPermission(userId: string, folderId: string, permissionId: number) {
+        return this.userFolderRepository.upsert({
+            userId,
+            folderId,
+            permissionId,
+        }, ["userId", "folderId"]);
     }
 
-    async revokePermission(folderId: string, userId: string, permissionId: number) {
-        return this.userFolderRepository.delete({ folderId, userId, permissionId });
+    async revokePermission(folderId: string, userId: string) {
+        return this.userFolderRepository.delete({ folderId, userId });
     }
 
     private createFolderQuery(userId: string, limit: number, currentCursor: string) {
