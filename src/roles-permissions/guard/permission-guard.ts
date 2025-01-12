@@ -35,6 +35,8 @@ export class PermissionGuard implements CanActivate {
                 return this.rolesPermissionsService.canModifyDocument(user.userId, request.params.id);
             case 'read:document':
                 return this.rolesPermissionsService.canReadDocument(user.userId, request.params.id);
+            case 'read:folderDocuments':
+                return this.rolesPermissionsService.canReadFolderDocuments(user.userId, request.params.id)
             default:
                 return false;
         }

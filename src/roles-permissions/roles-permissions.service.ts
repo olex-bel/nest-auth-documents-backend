@@ -83,6 +83,16 @@ export class RolesPermissionsService {
         return [Permission.VIEW, Permission.CONTRIBUT, Permission.SUPERVISE].includes(documentPermission.permission_id);
     }
 
+    async canReadFolderDocuments(userId: string, folderId: string) {
+        const userFolderPermission = await this.getFolderPermission(userId, folderId);
+        
+        if (!userFolderPermission) {
+            throw new NotFoundException(`Folder ${folderId} not found.`);
+        }
+
+        return [Permission.VIEW, Permission.CONTRIBUT, Permission.SUPERVISE].includes(userFolderPermission.permission_id);
+    }
+
     private async getFolderPermission(userId: string, folderId: string): Promise<UserFolderPermissionType | null> {
         return this.folderRepository.createQueryBuilder('f')
             .select(['id', 'permission_id'])

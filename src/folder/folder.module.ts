@@ -5,10 +5,11 @@ import { FolderController } from './folder.controller';
 import { RolesPermissionsModule } from '../roles-permissions/roles-permissions.module';
 import Folder from '../entities/folder.entity';
 import UserFolder from '../entities/user.folder.entity';
+import Document from '../entities/document.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Folder, UserFolder]),
+    TypeOrmModule.forFeature([Folder, UserFolder, Document]),
     RolesPermissionsModule
   ],
   providers: [FolderService],

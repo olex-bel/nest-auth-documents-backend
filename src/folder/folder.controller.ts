@@ -50,15 +50,10 @@ export class FolderController {
     }
 
     @Get(':id')
+    @RequirePermissions('read:folderDocuments')
     @UseGuards(JwtAuthGuard)
-    async getFolder(@Param('id') id: string, @Request() req) {
-        const folder = await this.folderService.getFolder(id, req.user.userId);
-
-        if (!folder) {
-            throw new NotFoundException('Folder not found.');
-        }
-
-        return folder;
+    async getFolderDocuments(@Param('id') id: string) {
+        return this.folderService.getFolderDocuments(id);
     }
 
     @Get()
