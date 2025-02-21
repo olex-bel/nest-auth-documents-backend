@@ -37,14 +37,13 @@ export class RolesPermissionsService {
     ) {}
 
     async isAdmin(userId: string): Promise<boolean> {
-        const userRole = await this.userRoleRepository.find({
-            where: { 
-                userId,
-                roleId: ADMIN_ROLE_ID,
-            },
-        });
+        const userRole = await this.userRoleRepository.createQueryBuilder('ur')
+            .select('ur.user_id')
+            .where('ur.user_id = :userId', { userId })
+            .andWhere('ur.role_id = :roleId', { roleId: ADMIN_ROLE_ID })
+            .getRawOne();
 
-        return userRole.length > 0;
+        return !!userRole;
     }
 
     async canCreateDocument(userId: string, folderId: string): Promise<boolean> {
@@ -93,21 +92,31 @@ export class RolesPermissionsService {
         return [Permission.VIEW, Permission.CONTRIBUT, Permission.SUPERVISE].includes(userFolderPermission.permission_id);
     }
 
-    private async getFolderPermission(userId: string, folderId: string): Promise<UserFolderPermissionType | null> {
+    async getFolderPermission(userId: string, folderId: string): Promise<UserFolderPermissionType | null> {
         return this.folderRepository.createQueryBuilder('f')
             .select(['id', 'permission_id'])
-            .leftJoin('user_folder', 'uf', 'f.id = uf.folder_id')
+            .leftJoin('user_folders', 'uf', 'f.id = uf.folder_id')
             .where('uf.user_id = :userId', { userId })
-            .andWhere('uf.id = :folderId', { folderId })
+            .andWhere('f.id = :folderId', { folderId })
             .getRawOne<UserFolderPermissionType>();
     }
 
-    private async getDocumentPermission(userId: string, documentId: string): Promise<DocumentPermissionType | null> {
+    async getDocumentPermission(userId: string, documentId: string): Promise<DocumentPermissionType | null> {
         return this.documentRepository.createQueryBuilder('d')
-            .select(['id', 'user_id', 'permission_id'])
-            .leftJoin('user_folder', 'uf', 'f.id = uf.folder_id')
+            .select(['id', 'permission_id'])
+            .leftJoin('user_folders', 'uf', 'd.folder_id = uf.folder_id')
             .where('uf.user_id = :userId', { userId })
             .andWhere('d.id = :documentId', { documentId })
             .getRawOne<DocumentPermissionType>();
+    }
+
+    async getRoles(userId: string) {
+        const userRoles = [];
+
+        if (await this.isAdmin(userId)) {
+            userRoles.push('admin');
+        }
+
+        return userRoles;
     }
 }

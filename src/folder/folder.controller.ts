@@ -8,6 +8,7 @@ import { RenameFolderDto } from './dto/rename-folder.dto';
 import { GetFoldersDto } from './dto/get-folders.dto';
 import { SetPermissionsDto } from './dto/set-permission.dto';
 import { RevokePermissionDto } from './dto/revoke-permission.dto';
+import { GetDocumentDto } from './dto/get-documents.dto';
 
 @Controller('folder')
 export class FolderController {
@@ -52,8 +53,9 @@ export class FolderController {
     @Get(':id')
     @RequirePermissions('read:folderDocuments')
     @UseGuards(JwtAuthGuard)
-    async getFolderDocuments(@Param('id') id: string) {
-        return this.folderService.getFolderDocuments(id);
+    async getFolderDocuments(@Param('id') id: string, @Query() getDocumentDto: GetDocumentDto) {
+        const { limit, cursor } = getDocumentDto;
+        return this.folderService.getFolderDocuments(id, limit, cursor);
     }
 
     @Get()

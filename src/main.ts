@@ -7,6 +7,15 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe({
         transform: true,
     }));
-    await app.listen(3000);
+
+    const allowedOrigins = process.env.CORS_ORIGINS ?
+        process.env.CORS_ORIGINS.split(',').map(item => item.trim()) : null;
+
+    if (allowedOrigins) {
+        app.enableCors({
+            origin: allowedOrigins,
+        });
+    }
+    await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

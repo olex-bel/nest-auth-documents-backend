@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import Folder from '../entities/folder.entity';
 import UserFolder from '../entities/user.folder.entity';
 import Document from '../entities/document.entity';
+import { paginateResults } from 'src/utils/pagination';
 
 @Injectable()
 export class FolderService {
@@ -30,19 +31,31 @@ export class FolderService {
         return this.folderRepository.update(folderId, { name: folderName });
     }
 
-    async getFolderDocuments(folderId: string) {
-        return this.documentRepository.find({
-            where: {
-                folderId,
-            }
-        })
+    async getFolderDocuments(folderId: string, limit: number, currentCursor: string) {
+        const documentQuery = this.documentRepository.createQueryBuilder('d')
+            .select(['d.id as id', 'd.title as title'])
+            .where('d.folder_id = :folderId', { folderId });
+
+        return paginateResults(
+            documentQuery,
+            limit,
+            currentCursor,
+            'id'
+        );
     }
 
     async getFolders(userId: string, limit: number, currentCursor: string) {
-        const folders = await this.createFoldersQuery(userId, limit, currentCursor).getRawMany();
-        const newCursor = this.calculateNewCursor(folders, limit);
-        
-        return { folders, newCursor };
+        const folderQuery = this.userFolderRepository.createQueryBuilder('uf')
+            .select(['f.id as id', 'f.name as name', 'uf.permission_id as "permissionId"'])
+            .leftJoin(Folder, 'f', 'f.id = uf.folderId')
+            .where('uf.userId = :userId', { userId });
+
+        return paginateResults(
+            folderQuery,
+            limit,
+            currentCursor,
+            'id'
+        );
     }
 
     async setPermission(userId: string, folderId: string, permissionId: number) {
@@ -55,26 +68,5 @@ export class FolderService {
 
     async revokePermission(folderId: string, userId: string) {
         return this.userFolderRepository.delete({ folderId, userId });
-    }
-
-    private createFoldersQuery(userId: string, limit: number, currentCursor: string) {
-        const folderQuery = this.userFolderRepository.createQueryBuilder('uf')
-            .select(['f.id as id', 'f.name as name'])
-            .leftJoin(Folder, 'f', 'f.id = uf.folderId')
-            .where('uf.userId = :userId', { userId });
-
-        if (currentCursor) {
-            folderQuery.andWhere('f.id > :currentCursor', { currentCursor });
-        }
-
-        return folderQuery.orderBy('f.id', 'ASC').limit(limit);
-    }
-
-    private calculateNewCursor(folders, limit) {
-        if (folders.length === 0) {
-            return null;
-        }
-
-        return folders.length === limit ? folders[folders.length - 1].id : null;
     }
 }

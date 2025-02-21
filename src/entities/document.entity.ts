@@ -1,8 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import User from './user.entity';
 import Folder from './folder.entity';
 
 @Entity({ name: 'documents' })
+@Index(['folderId', 'userId'])
 export default class Document {
     @PrimaryGeneratedColumn()
     id: string;
