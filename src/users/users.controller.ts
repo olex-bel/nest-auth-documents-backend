@@ -13,7 +13,7 @@ export class UsersController {
             throw new NotFoundException();
         }
 
-        return userFolderPermission;
+        return {permission:  userFolderPermission };
     }
 
     @Get('document-permissions/:documentId')
@@ -24,7 +24,7 @@ export class UsersController {
             throw new NotFoundException();
         }
 
-        return documentPermission;
+        return { permission: documentPermission, isOwner: documentPermission.user_id === req.user.userId };
     }
 
     @Get('roles')

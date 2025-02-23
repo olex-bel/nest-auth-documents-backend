@@ -50,7 +50,7 @@ export class DocumentController {
     @RequirePermissions('update:document')
     @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
-    async updateDocument(@Param('id') documentId, updateDocumentDto: UpdateDocumentDto) {
+    async updateDocument(@Param('id') documentId, @Body() updateDocumentDto: UpdateDocumentDto) {
         const updated = await this.documentService.updateDocument(documentId, updateDocumentDto);
 
         if (updated.affected === 0) {

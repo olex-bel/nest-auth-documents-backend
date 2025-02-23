@@ -103,7 +103,7 @@ export class RolesPermissionsService {
 
     async getDocumentPermission(userId: string, documentId: string): Promise<DocumentPermissionType | null> {
         return this.documentRepository.createQueryBuilder('d')
-            .select(['id', 'permission_id'])
+            .select(['id', 'permission_id', 'd.user_id'])
             .leftJoin('user_folders', 'uf', 'd.folder_id = uf.folder_id')
             .where('uf.user_id = :userId', { userId })
             .andWhere('d.id = :documentId', { documentId })
