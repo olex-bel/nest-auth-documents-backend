@@ -5,10 +5,10 @@ import { PermissionGuard } from '../roles-permissions/guard/permission-guard';
 import { RequirePermissions } from '../decorators/permission.decorator';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { RenameFolderDto } from './dto/rename-folder.dto';
-import { GetFoldersDto } from './dto/get-folders.dto';
+import { SearchQueryDto } from './dto/search-query.dto';
 import { SetPermissionsDto } from './dto/set-permission.dto';
 import { RevokePermissionDto } from './dto/revoke-permission.dto';
-import { GetDocumentDto } from './dto/get-documents.dto';
+import { AllFolderSearchDto } from './dto/all-folder-search.dto';
 
 @Controller('folder')
 export class FolderController {
@@ -16,15 +16,28 @@ export class FolderController {
 
     @Post()
     @RequirePermissions('create:folder')
-    @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
     async createFolder(@Body() createFolderDto: CreateFolderDto) {
         return this.folderService.createFolder(createFolderDto.name);
     }
 
+    @Get('all')
+    @UseGuards(PermissionGuard)
+    @RequirePermissions('read:allFolder')
+    async getAllFolders(@Query() searchFoldersDto: AllFolderSearchDto) {
+        const { limit, cursor, query, userId } = searchFoldersDto;
+
+        console.log(query)
+
+        if (userId) {
+            return this.folderService.getFolders(userId, limit, cursor, query);
+        }
+
+        return this.folderService.getAllFolders(limit, cursor, query);
+    }
+
     @Delete(':id')
     @RequirePermissions('delete:folder')
-    @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
     async deleteFolder(@Param('id') id: string) {
         const deleted = await this.folderService.deleteFolder(id);
@@ -38,7 +51,6 @@ export class FolderController {
 
     @Patch('rename/:id')
     @RequirePermissions('rename:folder')
-    @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
     async renameFolder(@Body() renameFolderDto: RenameFolderDto, @Param('id') id: string) {
         const updated = await this.folderService.renameFolder(id, renameFolderDto.name);
@@ -52,22 +64,20 @@ export class FolderController {
 
     @Get(':id')
     @RequirePermissions('read:folderDocuments')
-    @UseGuards(JwtAuthGuard)
-    async getFolderDocuments(@Param('id') id: string, @Query() getDocumentDto: GetDocumentDto) {
-        const { limit, cursor } = getDocumentDto;
-        return this.folderService.getFolderDocuments(id, limit, cursor);
+    @UseGuards(PermissionGuard)
+    async getFolderDocuments(@Param('id') id: string, @Query() searchDocumentDto: SearchQueryDto) {
+        const { limit, cursor, query } = searchDocumentDto;
+        return this.folderService.getFolderDocuments(id, limit, cursor, query);
     }
 
     @Get()
-    @UseGuards(JwtAuthGuard)
-    async getFolders(@Query() getFoldersDto: GetFoldersDto, @Request() req) {
-        const { limit, cursor } = getFoldersDto;
-        return this.folderService.getFolders(req.user.userId, limit, cursor);
+    async getFolders(@Query() searchFoldersDto: SearchQueryDto, @Request() req) {
+        const { limit, cursor, query } = searchFoldersDto;
+        return this.folderService.getFolders(req.user.userId, limit, cursor, query);
     }
 
     @Post(':folderId/permissions')
     @RequirePermissions('manage:permissions')
-    @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
     async setPermission(@Body() setPermissionsDto: SetPermissionsDto, @Param('folderId') folderId: string) {
         const { userId, permissionId } = setPermissionsDto;
@@ -93,7 +103,6 @@ export class FolderController {
 
     @Delete(':folderId/permissions')
     @RequirePermissions('manage:permissions')
-    @UseGuards(JwtAuthGuard)
     @UseGuards(PermissionGuard)
     async removePermission(@Body() revokePermissionDto: RevokePermissionDto, @Param('folderId') folderId: string) {
         const { userId } = revokePermissionDto;

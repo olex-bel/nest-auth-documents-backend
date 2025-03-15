@@ -14,7 +14,6 @@ export default class User {
     password: string;
 
     @Column({ default: true })
-    @Exclude()
     enabled: boolean;
 
     @Column({ name: 'failed_login_attempts', default: 0 })

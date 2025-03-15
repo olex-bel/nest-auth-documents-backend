@@ -10,6 +10,7 @@ import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
 import { FolderModule } from './folder/folder.module';
 import { RolesPermissionsModule } from './roles-permissions/roles-permissions.module';
 import { DocumentModule } from './document/document.module';
+import { FoldersSubscriber } from './subscribers/FoldersSubscriber ';
 
 @Module({
     imports: [
@@ -27,6 +28,7 @@ import { DocumentModule } from './document/document.module';
                 database: configService.get('POSTGRES_DB'),
                 ssl: configService.get('POSTGRES_SSL') === 'true',
                 entities: [__dirname + '/../**/*.entity.js'],
+                subscribers: [FoldersSubscriber],
                 synchronize: configService.get('TYPEORM_SYNCHRONIZE') === 'true',
                 logging: configService.get('TYPEORM_LOGGING'),
             }),

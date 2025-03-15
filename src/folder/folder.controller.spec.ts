@@ -6,7 +6,7 @@ import { FolderService } from './folder.service';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { RenameFolderDto } from './dto/rename-folder.dto';
 import { SetPermissionsDto } from './dto/set-permission.dto';
-import { GetFoldersDto } from './dto/get-folders.dto';
+import { GetFoldersDto } from './dto/search-query.dto';
 
 const mockRolesPermissionsService = {};
 const mockFolderService = {

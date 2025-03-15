@@ -18,7 +18,7 @@ export class PermissionGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const user = request.user as PublicUser;
 
-        switch (requiredPermission) {
+        switch (requiredPermission) {            
             case 'create:folder':
                 return this.rolesPermissionsService.isAdmin(user.userId);
             case 'delete:folder':
@@ -26,6 +26,10 @@ export class PermissionGuard implements CanActivate {
             case 'rename:folder':
                 return this.rolesPermissionsService.isAdmin(user.userId);
             case 'manage:permissions':
+                return this.rolesPermissionsService.isAdmin(user.userId);
+            case 'manage:users':
+                return this.rolesPermissionsService.isAdmin(user.userId);
+            case 'read:allFolder':
                 return this.rolesPermissionsService.isAdmin(user.userId);
             case 'create:document':
                 return this.rolesPermissionsService.canCreateDocument(user.userId, request.params.folderId);

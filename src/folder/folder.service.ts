@@ -31,7 +31,7 @@ export class FolderService {
         return this.folderRepository.update(folderId, { name: folderName });
     }
 
-    async getFolderDocuments(folderId: string, limit: number, currentCursor: string) {
+    async getFolderDocuments(folderId: string, limit: number, currentCursor: string, query?: string) {
         const documentQuery = this.documentRepository.createQueryBuilder('d')
             .select(['d.id as id', 'd.title as title'])
             .where('d.folder_id = :folderId', { folderId });
@@ -44,11 +44,31 @@ export class FolderService {
         );
     }
 
-    async getFolders(userId: string, limit: number, currentCursor: string) {
+    async getFolders(userId: string, limit: number, currentCursor: string, query?: string) {
         const folderQuery = this.userFolderRepository.createQueryBuilder('uf')
             .select(['f.id as id', 'f.name as name', 'uf.permission_id as "permissionId"'])
             .leftJoin(Folder, 'f', 'f.id = uf.folderId')
             .where('uf.userId = :userId', { userId });
+        
+        if (query) {
+            folderQuery.andWhere('f.name @@ plainto_tsquery(:query)', { query });
+        }
+
+        return paginateResults(
+            folderQuery,
+            limit,
+            currentCursor,
+            'id'
+        );
+    }
+
+    async getAllFolders(limit: number, currentCursor: string, query?: string) {
+        const folderQuery = this.folderRepository.createQueryBuilder('f')
+            .select(['f.id as id', 'f.name as name']);
+        
+        if (query) {
+            folderQuery.andWhere('f.name @@ plainto_tsquery(:query)', { query });
+        }
 
         return paginateResults(
             folderQuery,

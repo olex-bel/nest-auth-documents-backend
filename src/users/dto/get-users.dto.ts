@@ -2,7 +2,7 @@
 import { IsString, IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class GetFoldersDto {
+export class GetUsersDto {
     @IsString()
     @IsOptional()
     cursor?: string;
