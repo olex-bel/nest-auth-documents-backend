@@ -1,14 +1,11 @@
-import { Controller, Post, Patch, Delete, Get, UseGuards, Body, Request, Param, Query, NotFoundException, ConflictException } from '@nestjs/common';
+import { Controller, Post, Patch, Delete, Get, Put, UseGuards, Body, Request, Param, Query, NotFoundException, ConflictException } from '@nestjs/common';
 import { FolderService } from './folder.service';
-import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { PermissionGuard } from '../roles-permissions/guard/permission-guard';
 import { RequirePermissions } from '../decorators/permission.decorator';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { RenameFolderDto } from './dto/rename-folder.dto';
 import { SearchQueryDto } from './dto/search-query.dto';
 import { SetPermissionsDto } from './dto/set-permission.dto';
-import { RevokePermissionDto } from './dto/revoke-permission.dto';
-import { AllFolderSearchDto } from './dto/all-folder-search.dto';
 
 @Controller('folder')
 export class FolderController {
@@ -24,15 +21,8 @@ export class FolderController {
     @Get('all')
     @UseGuards(PermissionGuard)
     @RequirePermissions('read:allFolder')
-    async getAllFolders(@Query() searchFoldersDto: AllFolderSearchDto) {
-        const { limit, cursor, query, userId } = searchFoldersDto;
-
-        console.log(query)
-
-        if (userId) {
-            return this.folderService.getFolders(userId, limit, cursor, query);
-        }
-
+    async getAllFolders(@Query() searchFoldersDto: SearchQueryDto) {
+        const { limit, cursor, query } = searchFoldersDto;
         return this.folderService.getAllFolders(limit, cursor, query);
     }
 
@@ -70,13 +60,7 @@ export class FolderController {
         return this.folderService.getFolderDocuments(id, limit, cursor, query);
     }
 
-    @Get()
-    async getFolders(@Query() searchFoldersDto: SearchQueryDto, @Request() req) {
-        const { limit, cursor, query } = searchFoldersDto;
-        return this.folderService.getFolders(req.user.userId, limit, cursor, query);
-    }
-
-    @Post(':folderId/permissions')
+    @Put(':folderId/permissions')
     @RequirePermissions('manage:permissions')
     @UseGuards(PermissionGuard)
     async setPermission(@Body() setPermissionsDto: SetPermissionsDto, @Param('folderId') folderId: string) {
@@ -101,11 +85,10 @@ export class FolderController {
         }
     }
 
-    @Delete(':folderId/permissions')
+    @Delete(':folderId/permissions/:userId')
     @RequirePermissions('manage:permissions')
     @UseGuards(PermissionGuard)
-    async removePermission(@Body() revokePermissionDto: RevokePermissionDto, @Param('folderId') folderId: string) {
-        const { userId } = revokePermissionDto;
+    async removePermission(@Param('userId') userId, @Param('folderId') folderId: string) {
         const deleted = await this.folderService.revokePermission(folderId, userId);
 
         if (deleted.affected === 0) {

@@ -24,7 +24,7 @@ export class FoldersSubscriber implements EntitySubscriberInterface<Folder> {
             `
               UPDATE folders
               SET "name_full_text_search" = to_tsvector(coalesce(name,''))
-              WHERE AND id = $1;
+              WHERE id = $1;
               `,
             [event.entity.id],
         );

@@ -44,24 +44,6 @@ export class FolderService {
         );
     }
 
-    async getFolders(userId: string, limit: number, currentCursor: string, query?: string) {
-        const folderQuery = this.userFolderRepository.createQueryBuilder('uf')
-            .select(['f.id as id', 'f.name as name', 'uf.permission_id as "permissionId"'])
-            .leftJoin(Folder, 'f', 'f.id = uf.folderId')
-            .where('uf.userId = :userId', { userId });
-        
-        if (query) {
-            folderQuery.andWhere('f.name @@ plainto_tsquery(:query)', { query });
-        }
-
-        return paginateResults(
-            folderQuery,
-            limit,
-            currentCursor,
-            'id'
-        );
-    }
-
     async getAllFolders(limit: number, currentCursor: string, query?: string) {
         const folderQuery = this.folderRepository.createQueryBuilder('f')
             .select(['f.id as id', 'f.name as name']);

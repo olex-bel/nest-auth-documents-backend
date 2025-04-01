@@ -1,15 +1,20 @@
-import { Controller, Get, Param, Request, NotFoundException, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Param, Request, NotFoundException, UseGuards, Query, Body, Patch } from '@nestjs/common';
 import { RolesPermissionsService } from '../roles-permissions/roles-permissions.service';
+import { UserFoldersService } from '../user-folders/user-folders.service';
 import { UsersService } from './users.service';
 import { RequirePermissions } from '../decorators/permission.decorator';
 import { PermissionGuard } from '../roles-permissions/guard/permission-guard';
 import { GetUsersDto } from './dto/get-users.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { SearchQueryDto } from '../folder/dto/search-query.dto';
+import { GetFoldersDto } from './dto/get-folders.dto';
 
 @Controller('users')
 export class UsersController {
     constructor(
         private rolesPermissionsService: RolesPermissionsService,
-        private usersService: UsersService
+        private usersService: UsersService,
+        private userFolderService: UserFoldersService
     ) { }
 
     @Get('folder-premissions/:folderId')
@@ -53,4 +58,29 @@ export class UsersController {
         return await this.usersService.getUserById(id);
     }
 
+    @Patch(':id')
+    @RequirePermissions('manage:users')
+    @UseGuards(PermissionGuard)
+    async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+        return await this.usersService.updateUser(id, updateUserDto);
+    }
+
+    @Get('me/folders')
+    async getFolders(@Query() searchFoldersDto: SearchQueryDto, @Request() req) {
+        const { limit, cursor, query } = searchFoldersDto;
+        return this.userFolderService.getFolders(req.user.userId, limit, cursor, query);
+    }
+
+    @Get(':id/folders')
+    @UseGuards(PermissionGuard)
+    @RequirePermissions('manage:permissions')
+    async getUserFolders(@Param('id') userId: string, @Query() searchFoldersDto: GetFoldersDto) {
+            const { limit, cursor, query, assigned = true } = searchFoldersDto;
+
+        if (!assigned) {
+            return this.userFolderService.getFolders(userId, limit, cursor, query);
+        }
+
+        return this.userFolderService.getUserNoAssignedFolders(userId, limit, cursor, query);
+    }
 }

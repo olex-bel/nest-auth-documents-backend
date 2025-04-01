@@ -11,6 +11,7 @@ import { FolderModule } from './folder/folder.module';
 import { RolesPermissionsModule } from './roles-permissions/roles-permissions.module';
 import { DocumentModule } from './document/document.module';
 import { FoldersSubscriber } from './subscribers/FoldersSubscriber ';
+import { UserFoldersModule } from './user-folders/user-folders.module';
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { FoldersSubscriber } from './subscribers/FoldersSubscriber ';
         FolderModule,
         RolesPermissionsModule,
         DocumentModule,
+        UserFoldersModule,
     ],
     controllers: [HealthController],
     providers: [

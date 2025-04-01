@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from '../entities/user.entity';
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { paginateResults } from 'src/utils/pagination';
 
 @Injectable()
@@ -57,5 +58,10 @@ export class UsersService {
                 id: userId,
             },
         });
+    }
+
+    async updateUser(userId: string, updateUserDto: UpdateUserDto) {
+        const { enabled } = updateUserDto;
+        return this.usersRepository.update(userId, { enabled });
     }
 }
