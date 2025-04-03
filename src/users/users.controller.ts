@@ -75,9 +75,9 @@ export class UsersController {
     @UseGuards(PermissionGuard)
     @RequirePermissions('manage:permissions')
     async getUserFolders(@Param('id') userId: string, @Query() searchFoldersDto: GetFoldersDto) {
-            const { limit, cursor, query, assigned = true } = searchFoldersDto;
+        const { limit, cursor, query, assigned = true } = searchFoldersDto;
 
-        if (!assigned) {
+        if (assigned) {
             return this.userFolderService.getFolders(userId, limit, cursor, query);
         }
 

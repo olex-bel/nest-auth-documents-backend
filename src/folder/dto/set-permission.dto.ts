@@ -1,5 +1,6 @@
 
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class SetPermissionsDto {
     @IsString()
@@ -8,5 +9,6 @@ export class SetPermissionsDto {
 
     @IsNumber()
     @IsNotEmpty()
+    @Type(() => Number)
     permissionId: number;
 }
