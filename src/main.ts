@@ -12,7 +12,6 @@ async function bootstrap() {
         process.env.CORS_ORIGINS.split(',').map(item => item.trim()) : null;
 
     if (allowedOrigins) {
-        console.log('CORS enabled for origins:', allowedOrigins);
         app.enableCors({
             origin: allowedOrigins,
         });
